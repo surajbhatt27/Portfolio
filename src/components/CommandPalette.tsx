@@ -19,16 +19,26 @@ export const CommandPalette = forwardRef<CommandPaletteHandle, CommandPalettePro
         const [open, setOpen] = useState(false);
         const inputRef = useRef<HTMLInputElement>(null);
 
+        const isMobile = () => {
+            return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        };
+
         useImperativeHandle(ref, () => ({
             open: () => {
                 setOpen(true);
-                setTimeout(() => inputRef.current?.focus(), 0);
+                // Only auto-focus on desktop
+                if (!isMobile()) {
+                    setTimeout(() => inputRef.current?.focus(), 0);
+                }
             },
             close: () => setOpen(false),
             toggle: () => {
                 setOpen((prev) => {
                     if (!prev) {
-                        setTimeout(() => inputRef.current?.focus(), 0);
+                        // Only auto-focus on desktop
+                        if (!isMobile()) {
+                            setTimeout(() => inputRef.current?.focus(), 0);
+                        }
                     }
                     return !prev;
                 });
@@ -41,7 +51,9 @@ export const CommandPalette = forwardRef<CommandPaletteHandle, CommandPalettePro
                     e.preventDefault();
                     setOpen((prev) => {
                         if (!prev) {
-                            setTimeout(() => inputRef.current?.focus(), 0);
+                            if (!isMobile()) {
+                                setTimeout(() => inputRef.current?.focus(), 0);
+                            }
                         }
                         return !prev;
                     });

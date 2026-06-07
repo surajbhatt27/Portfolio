@@ -26,7 +26,6 @@ export const CommandPalette = forwardRef<CommandPaletteHandle, CommandPalettePro
         useImperativeHandle(ref, () => ({
             open: () => {
                 setOpen(true);
-                // Only auto-focus on desktop
                 if (!isMobile()) {
                     setTimeout(() => inputRef.current?.focus(), 0);
                 }
@@ -34,11 +33,8 @@ export const CommandPalette = forwardRef<CommandPaletteHandle, CommandPalettePro
             close: () => setOpen(false),
             toggle: () => {
                 setOpen((prev) => {
-                    if (!prev) {
-                        // Only auto-focus on desktop
-                        if (!isMobile()) {
-                            setTimeout(() => inputRef.current?.focus(), 0);
-                        }
+                    if (!prev && !isMobile()) {
+                        setTimeout(() => inputRef.current?.focus(), 0);
                     }
                     return !prev;
                 });
@@ -50,10 +46,8 @@ export const CommandPalette = forwardRef<CommandPaletteHandle, CommandPalettePro
                 if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k") {
                     e.preventDefault();
                     setOpen((prev) => {
-                        if (!prev) {
-                            if (!isMobile()) {
-                                setTimeout(() => inputRef.current?.focus(), 0);
-                            }
+                        if (!prev && !isMobile()) {
+                            setTimeout(() => inputRef.current?.focus(), 0);
                         }
                         return !prev;
                     });
@@ -81,11 +75,22 @@ export const CommandPalette = forwardRef<CommandPaletteHandle, CommandPalettePro
                     className="fixed top-1/2 left-1/2 w-[calc(100%-2rem)] max-w-[90vw] md:w-125 bg-gray-950 border border-gray-800 rounded-xl shadow-2xl overflow-hidden z-50"
                     style={{ transform: "translate(-50%, -50%)" }}
                 >
-                    <Command.Input
-                        ref={inputRef}
-                        placeholder="Search commands..."
-                        className="w-full bg-transparent px-4 py-3 text-gray-200 outline-none border-b border-gray-800 placeholder-gray-500 text-base md:text-sm"
-                    />
+                    {/* Only show search input on desktop */}
+                    {!isMobile() && (
+                        <Command.Input
+                            ref={inputRef}
+                            placeholder="Search commands..."
+                            className="w-full bg-transparent px-4 py-3 text-gray-200 outline-none border-b border-gray-800 placeholder-gray-500 text-base md:text-sm"
+                        />
+                    )}
+                    
+                    {/* Mobile: Just show heading instead of search */}
+                    {isMobile() && (
+                        <div className="px-4 py-3 border-b border-gray-800">
+                            <h2 className="text-gray-400 text-sm font-mono">Commands</h2>
+                        </div>
+                    )}
+                    
                     <Command.List className="max-h-64 overflow-y-auto custom-scrollbar">
                         <Command.Empty className="px-4 py-8 text-center text-gray-500">
                             No commands found
